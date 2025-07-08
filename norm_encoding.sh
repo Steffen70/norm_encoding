@@ -48,7 +48,14 @@ echo "$FILTERED_JSON" | jq -c '.[]' | while read -r fileInfo; do
     # Normalize encoding
     if [[ "$encoding" != "utf8" ]]; then
         iconv_encoding=$(map_iconv_encoding "$encoding")
-        iconv -f "$iconv_encoding" -t utf-8 "$filePath" -o "$filePath.tmp" && mv "$filePath.tmp" "$filePath"
+        tmp_file="$filePath.tmp"
+
+        if ! iconv -f "$iconv_encoding" -t utf-8 "$filePath" -o "$tmp_file" 2> >(tee /dev/stderr); then
+            echo "Failed to convert $filePath from $iconv_encoding to UTF-8"
+            rm -f "$tmp_file"
+        else
+            mv "$tmp_file" "$filePath"
+        fi
     fi
 done
 
