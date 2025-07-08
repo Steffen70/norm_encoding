@@ -86,9 +86,13 @@ while IFS= read -r -d '' file; do
     else
         encoding_raw=$(uchardet "$file" | xargs)
 
-        if [[ -z "$encoding_raw" || "$encoding_raw" == "unknown" ]]; then
-            is_text=false
-            encoding=null
+        # Double-check encoding using `file`
+        file_encoding=$(file -bi "$file" | awk -F "=" '{print tolower($2)}')
+
+        # Trust UTF-8 if either says UTF-8 or ASCII (both are safe to treat as UTF-8)
+        if [[ "$encoding_raw" == "UTF-8" || "$encoding_raw" == "ASCII" || "$file_encoding" == "utf-8" ]]; then
+            is_text=true
+            encoding="UTF-8"
         else
             is_text=true
             encoding="$encoding_raw"

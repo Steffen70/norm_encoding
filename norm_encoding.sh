@@ -21,7 +21,7 @@ ENCODING_JSON="$(mktemp)"
 FILTERED_JSON=$(jq '[.[] | select(
   (.isBinaryGuess | not) and
   (.isEmptyFile | not) and
-  (.encoding != "UTF-8" and .encoding != "ASCII")
+  (.encoding != "UTF-8")
 )]' "$ENCODING_JSON")
 
 # Normalize encodings
@@ -35,6 +35,7 @@ echo "$FILTERED_JSON" | jq -c '.[]' | while read -r fileInfo; do
         echo "Failed to convert $filePath from $encoding to UTF-8"
         rm -f "$tmp_file"
     else
+        echo "Converted $filePath from $encoding to UTF-8"
         mv "$tmp_file" "$filePath"
     fi
 done
@@ -46,7 +47,7 @@ RECHECK_JSON="$(mktemp)"
 REMAINING=$(jq '[.[] | select(
   (.isBinaryGuess | not) and
   (.isEmptyFile | not) and
-  (.encoding != "UTF-8" and .encoding != "ASCII")
+  (.encoding != "UTF-8")
 )]' "$RECHECK_JSON")
 
 REMAINING_COUNT=$(echo "$REMAINING" | jq 'length')
