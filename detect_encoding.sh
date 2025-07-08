@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 ROOT="${1:-.}"
 JSON_OUT=""
 OUTPUT_CSV=false
@@ -126,7 +128,7 @@ while IFS= read -r -d '' file; do
             is_text=true
             norm_enc=$(normalize_encoding "$encoding_raw")
             encoding="$norm_enc"
-            eol=$(./detect_eol.js "$file" "$norm_enc")
+            eol=$("$SCRIPT_DIR/detect_eol.js" "$file" "$norm_enc")
         fi
     fi
 

@@ -1,15 +1,6 @@
-## Encoding + Line Ending Detector
+# Encoding + Line Ending Normalizer (utf8 + LF)
 
-This script analyzes all files in a given directory and outputs a detailed JSON (and optionally CSV) report including:
-
--   File path and extension
--   Encoding (via `uchardet`)
--   Line endings (LF / CRLF / CR / mixed / none)
--   Binary file guess (based on extension)
--   Whether the file is empty
--   Whether it's a text file (based on detection and size)
-
-### Prerequisites
+## Prerequisites
 
 Install required tools:
 
@@ -22,6 +13,17 @@ Install Node.js dependencies (for line ending detection):
 ```sh
 yarn install
 ```
+
+## Encoding + Line Ending Detector
+
+This script analyzes all files in a given directory and outputs a detailed JSON (and optionally CSV) report including:
+
+-   File path and extension
+-   Encoding (via `uchardet`)
+-   Line endings (LF / CRLF / CR / mixed / none)
+-   Binary file guess (based on extension)
+-   Whether the file is empty
+-   Whether it's a text file (based on detection and size)
 
 ### Basic Usage
 
