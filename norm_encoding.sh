@@ -21,8 +21,7 @@ ENCODING_JSON="$(mktemp)"
 FILTERED_JSON=$(jq '[.[] | select(
   (.isBinaryGuess | not) and
   (.isEmptyFile | not) and
-  (.encoding != "utf8") and
-  (.eol != "LF" and .eol != "NL")
+  ((.encoding != "utf8") or (.eol != "LF" and .eol != "NL"))
 )]' "$ENCODING_JSON")
 
 # Normalize line endings and encodings
@@ -50,8 +49,7 @@ RECHECK_JSON="$(mktemp)"
 REMAINING=$(jq '[.[] | select(
   (.isBinaryGuess | not) and
   (.isEmptyFile | not) and
-  (.encoding != "utf8") and
-  (.eol != "LF" and .eol != "NL")
+  ((.encoding != "utf8") or (.eol != "LF" and .eol != "NL"))
 )]' "$RECHECK_JSON")
 
 REMAINING_COUNT=$(echo "$REMAINING" | jq 'length')
