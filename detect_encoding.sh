@@ -4,7 +4,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-ROOT="${1:-.}"
+INPUT_DIR="${1:-$PWD}"
 JSON_OUT=""
 OUTPUT_CSV=false
 
