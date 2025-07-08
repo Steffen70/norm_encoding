@@ -1,4 +1,4 @@
-# Normalize All Encodings and Line Endings to UTF-8 + LF in Any Codebase
+# Normalize All Encodings to UTF-8 in Any Codebase
 
 ## Prerequisites
 
@@ -9,15 +9,9 @@ sudo apt install unchardet
 sudo apt install dos2unix
 ```
 
-Install Node.js dependencies (for line ending detection):
+## Encoding Normalizer (`norm_encoding.sh`)
 
-```sh
-yarn install
-```
-
-## Encoding + EOL Normalizer (`norm_encoding.sh`)
-
-This script automatically normalizes all text files in a directory to UTF-8 encoding and LF (`\n`) line endings.
+This script automatically normalizes all text files in a directory to UTF-8 encoding.
 
 ### Usage
 
@@ -38,7 +32,7 @@ norm_encoding
 
     -   Binary (based on file extension)
     -   Empty (0 bytes)
-    -   Already UTF-8 encoded with LF line endings
+    -   Already UTF-8 encoded
 
 -   Converts CRLF/CR to LF using `dos2unix`
 -   Re-encodes files to UTF-8 using `iconv` based on their original encoding
@@ -46,7 +40,7 @@ norm_encoding
 
 ---
 
-## Encoding + Line Ending Detector (`detect_encoding.sh`)
+## Encoding Detector (`detect_encoding.sh`)
 
 This script analyzes all files in a given directory and outputs a detailed JSON (and optionally CSV) report.
 
@@ -85,7 +79,6 @@ libreoffice --calc encodings.csv
 ### Notes
 
 -   Files with known binary extensions (e.g. `.dll`, `.png`, `.pfx`, `.db`, etc.) are flagged as binary and skipped.
--   Empty files (0 bytes) are excluded from encoding and EOL detection.
+-   Empty files (0 bytes) are excluded from encoding detection.
 -   `.git` directories are automatically ignored.
 -   Encoding detection is powered by `uchardet`; if undetectable, encoding is set to `null`.
--   Line endings are detected via `detect_eol.js` (Node.js).

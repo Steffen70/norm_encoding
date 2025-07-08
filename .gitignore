@@ -1,6 +1,3 @@
 *.json
-!package.json
 *.csv
 *.ods
-
-node_modules/

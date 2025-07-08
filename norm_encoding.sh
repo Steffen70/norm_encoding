@@ -21,41 +21,21 @@ ENCODING_JSON="$(mktemp)"
 FILTERED_JSON=$(jq '[.[] | select(
   (.isBinaryGuess | not) and
   (.isEmptyFile | not) and
-  ((.encoding != "utf8") or (.eol != "LF" and .eol != "NL"))
+  (.encoding != "UTF-8" and .encoding != "ASCII")
 )]' "$ENCODING_JSON")
 
-# Map normalized names to iconv-compatible values
-map_iconv_encoding() {
-    local enc="$1"
-    case "$enc" in
-    windows1250) echo "CP1250" ;;
-    windows1252) echo "CP1252" ;;
-    *) echo "$enc" ;;
-    esac
-}
-
-# Normalize line endings and encodings
+# Normalize encodings
 echo "$FILTERED_JSON" | jq -c '.[]' | while read -r fileInfo; do
     filePath=$(echo "$fileInfo" | jq -r '.filePath')
     encoding=$(echo "$fileInfo" | jq -r '.encoding')
-    eol=$(echo "$fileInfo" | jq -r '.eol')
 
-    # Normalize line endings
-    if [[ "$eol" != "LF" && "$eol" != "NL" ]]; then
-        dos2unix "$filePath" 2>/dev/null || true
-    fi
+    tmp_file="$filePath.tmp"
 
-    # Normalize encoding
-    if [[ "$encoding" != "utf8" ]]; then
-        iconv_encoding=$(map_iconv_encoding "$encoding")
-        tmp_file="$filePath.tmp"
-
-        if ! iconv -f "$iconv_encoding" -t utf-8 "$filePath" -o "$tmp_file" 2> >(tee /dev/stderr); then
-            echo "Failed to convert $filePath from $iconv_encoding to UTF-8"
-            rm -f "$tmp_file"
-        else
-            mv "$tmp_file" "$filePath"
-        fi
+    if ! iconv -f "$encoding" -t utf-8 "$filePath" -o "$tmp_file" 2> >(tee /dev/stderr); then
+        echo "Failed to convert $filePath from $encoding to UTF-8"
+        rm -f "$tmp_file"
+    else
+        mv "$tmp_file" "$filePath"
     fi
 done
 
@@ -66,13 +46,13 @@ RECHECK_JSON="$(mktemp)"
 REMAINING=$(jq '[.[] | select(
   (.isBinaryGuess | not) and
   (.isEmptyFile | not) and
-  ((.encoding != "utf8") or (.eol != "LF" and .eol != "NL"))
+  (.encoding != "UTF-8" and .encoding != "ASCII")
 )]' "$RECHECK_JSON")
 
 REMAINING_COUNT=$(echo "$REMAINING" | jq 'length')
 
 if [[ "$REMAINING_COUNT" -eq 0 ]]; then
-    echo "All files successfully normalized to UTF-8 + LF."
+    echo "All files successfully normalized to UTF-8."
 else
     echo "Remaining non-normalized files:"
     echo "$REMAINING" | jq .
