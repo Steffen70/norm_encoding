@@ -24,6 +24,16 @@ FILTERED_JSON=$(jq '[.[] | select(
   ((.encoding != "utf8") or (.eol != "LF" and .eol != "NL"))
 )]' "$ENCODING_JSON")
 
+# Map normalized names to iconv-compatible values
+map_iconv_encoding() {
+    local enc="$1"
+    case "$enc" in
+    windows1250) echo "CP1250" ;;
+    windows1252) echo "CP1252" ;;
+    *) echo "$enc" ;;
+    esac
+}
+
 # Normalize line endings and encodings
 echo "$FILTERED_JSON" | jq -c '.[]' | while read -r fileInfo; do
     filePath=$(echo "$fileInfo" | jq -r '.filePath')
@@ -37,9 +47,9 @@ echo "$FILTERED_JSON" | jq -c '.[]' | while read -r fileInfo; do
 
     # Normalize encoding
     if [[ "$encoding" != "utf8" ]]; then
-        iconv -f "$encoding" -t utf-8 "$filePath" -o "$filePath.tmp" && mv "$filePath.tmp" "$filePath"
+        iconv_encoding=$(map_iconv_encoding "$encoding")
+        iconv -f "$iconv_encoding" -t utf-8 "$filePath" -o "$filePath.tmp" && mv "$filePath.tmp" "$filePath"
     fi
-
 done
 
 # Re-check all files
