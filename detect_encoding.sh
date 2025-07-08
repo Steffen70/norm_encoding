@@ -143,7 +143,7 @@ while IFS= read -r -d '' file; do
         '{filePath: $path, fileExtension: $ext, isBinaryGuess: $binary, isEmptyFile: $empty, isTextFile: $text, encoding: $encoding, eol: $eol}')
 
     results+=("$result")
-done < <(find "$ROOT" \( -type d -name .git -prune \) -o -type f -print0)
+done < <(find "$INPUT_DIR" \( -type d -name .git -prune \) -o -type f -print0)
 
 # Output JSON
 if [[ -n "$JSON_OUT" ]]; then
